@@ -8,34 +8,40 @@
 import SwiftUI
 import SwiftData
 
-
+@available(iOS 17, *)
 struct HomeView: View {
-    @available(iOS 17, *)
     @Query(
         sort: \Entry.date,
         order: .reverse
     ) private var Entries: [Entry]
     
-    
     var body: some View {
-        
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("Journal")
                 .font(.title)
                 .bold()
                 .padding([.top, .leading, .trailing])
             
-            if #available(iOS 17, *) {
-                List(Entries) { Entry in
-                    HStack {
-                        Text(Entry.body)
-                        Spacer()
-                        Text(Entry.date, format: .dateTime.hour().minute().day().month())
-                            .font(.caption2)
-                            .fontWeight(.light)
-                            .foregroundColor(Color.gray)
-                    }
-                }} else {}}}}
+            List(Entries) { entry in
+                HStack {
+                    Text(entry.body)
+                    Spacer()
+                    Text(entry.date, format: .dateTime.hour().minute().day().month())
+                        .font(.caption2)
+                        .fontWeight(.light)
+                        .foregroundColor(Color.gray)
+                }
+                .padding(.vertical, 4)
+            }
+            .listStyle(PlainListStyle())
+        }
+    }
+}
+
 #Preview {
-    HomeView()
+    if #available(iOS 17, *) {
+        HomeView()
+    } else {
+        ZStack {}
+    }
 }

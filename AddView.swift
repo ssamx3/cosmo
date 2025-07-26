@@ -1,42 +1,42 @@
-//
-//  SwiftUIView.swift
-//  cosmo
-//
-//  Created by sam on 02/02/2025.
-//
+    //
+    //  SwiftUIView.swift
+    //  cosmo
+    //
+    //  Created by sam on 02/02/2025.
+    //
 
-import SwiftUI
-import SwiftData
+    import SwiftUI
+    import SwiftData
 
-@available(iOS 17, *)
-@Model
+    @available(iOS 17, *)
+    @Model
 
-class Entry {
-    var id = UUID()
-    var body: String
-    var date : Date
-    var xCoord: CGFloat
-    var yCoord: CGFloat
-    var starSize: CGFloat
-    init (body: String, date: Date = Date(), xCoord: CGFloat, yCoord: CGFloat, starSize: CGFloat ) {
-        self.id = UUID()
-        self.body = body
-        self.date = date
-        self.xCoord = xCoord
-        self.yCoord = yCoord
-        self.starSize = starSize
+    class Entry {
+        var id = UUID()
+        var body: String
+        var date : Date
+        var xCoord: CGFloat
+        var yCoord: CGFloat
+        var starSize: CGFloat
+        init (body: String, date: Date = Date(), xCoord: CGFloat, yCoord: CGFloat, starSize: CGFloat ) {
+            self.id = UUID()
+            self.body = body
+            self.date = date
+            self.xCoord = xCoord
+            self.yCoord = yCoord
+            self.starSize = starSize
+        }
     }
-}
 
 
-@available(iOS 17.0, *)
+    @available(iOS 17.0, *)
 
 struct AddView: View {
     @Environment(\.modelContext) private var modelContext
-   
+    
     // states
     @State var enter: String = ""
-    @State var textBoxString = "I'm grateful for..."
+    @State var textBoxString = ""
     @State private var showPopup = false
     @Environment(\.dismiss) var dismiss
     @FocusState var focused: Bool
@@ -50,123 +50,87 @@ struct AddView: View {
         
         
         modelContext.insert(new)
-        textBoxString = "I'm grateful for..."
+        textBoxString = ""
     }
     
     var body: some View {
+        ZStack {
         
-            ZStack{
-                //meshgradient background
-                
-                
-                TimelineView(.animation) { timeline in
-                    let x = (sin(timeline.date.timeIntervalSince1970) + 1) / 16
-                    let y = (cos(timeline.date.timeIntervalSince1970) + 6) / 32
-                    
-                    
-                    if #available(iOS 18.0, *) {
-                        MeshGradient(width: 3, height: 3, points: [
-                            [0, 0], [0.5, 0], [1, 0],
-                            [0, 0.5], [Float(x), Float(y)], [1, 0.5],
-                            [0, 1], [0.5, 1], [1, 1]
-                        ], colors: [
-                            .blue, .black, .black,
-                            .black, .accentColor, .blue,
-                            .black, .black, .black
-                        ])
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            focused = false
-                        }
-                    } else {
-                        
-                    }
-                }
-                
-                // meshgradient background
-                
-                // frosted glass
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20.0)
-                        .fill(.white)
-                        .opacity(0.25)
-                        .shadow(radius: 10.0)
-                        .padding(.horizontal)
-                        .onTapGesture {
-                            focused = false
-                        }
-                    
-                    
-                    // frosted glass
-                    
-                    // entry field and submit button
-                    
-                    VStack {
-                        
-                        
-                        
-                        EntryBox(placeholder: "type something you're grateful for...", text: $textBoxString).focused($focused)
-                        
-                        Button{
-                            entrySubmit(textEntered: textBoxString)
-                            showPopup = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                
-                                showPopup = false
-                                
-                            }
-                            dismiss()
-                        } label: {
-                            if #available(iOS 17.0, *) {
-                                HStack{
-                                    Text(" submit")
-                                        .font(.body)
-                                    
-                                    Image(systemName: "square.and.pencil" )
-                                }
-                                .padding(.all)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20.0)
-                                        .stroke(Color.white, lineWidth: 2)
-                                        .fill(Color.gray)
-                                        .opacity(0.25)
-                                        .shadow(radius: 10)
-                                )
-                                .foregroundColor(.white)
-                            } else {
-                            }
-                            
-                        }
-                        
-                        
-                    }
+            VStack {
+                TextEditor(text: $textBoxString)
+                    .foregroundStyle(Color.white)
+                    .focused($focused)
+                    .multilineTextAlignment(.leading)
+                    .font(.system(size: 16))
+                    .scrollContentBackground(.hidden)
                     .padding()
-                    VStack {
-                        Spacer()
-                    if showPopup == true {
-                        VStack {
-                            Spacer()
-                            PopUp()
-                                .padding(.bottom, 55)
-                        }
-                    }
-                }
-                    
-                }.fixedSize(horizontal: false, vertical: true)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20.0)
+                            .fill(Color.gray)
+                            .opacity(0.1)
+                            .shadow(radius: 10)
+                    )
                 
+                Spacer()
+            }
+            .padding()
+            .onAppear {
+                focused = true
             }
             
+           
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button {
+                        entrySubmit(textEntered: textBoxString)
+                        showPopup = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showPopup = false
+                        }
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark")
+                        }
+                        .padding(.all)
+                        .background(
+                            RoundedRectangle(cornerRadius: 100.0)
+                                .stroke(Color.white, lineWidth: 2)
+                                .fill(Color.gray)
+                                .opacity(0.25)
+                                .shadow(radius: 10)
+                        )
+                        .foregroundColor(.white)
+                    }
+                }
+                .padding(.bottom , 15)
+                .padding(.trailing, 5)
+            }
+            .padding()
             
-        
+            // Popup at bottom
+            VStack {
+                Spacer()
+                if showPopup == true {
+                    PopUp()
+                        .padding(.bottom, 55)
+                }
+            }
+        }
     }
+       
 }
 
-#Preview {
-    if #available(iOS 17.0, *) {
-        AddView()
-    } else {
-        // Fallback on earlier versions
+
+    #Preview {
+        if #available(iOS 17.0, *) {
+            AddView()
+        } else {
+            ZStack {
+            
+            }
+        }
+        
     }
-    
-}

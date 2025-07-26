@@ -16,8 +16,8 @@ let package = Package(
         .iOSApplication(
             name: "Cosmo",
             targets: ["AppModule"],
-            bundleIdentifier: "sam.cosmo",
-            teamIdentifier: "3KYQA6KZKN",
+            bundleIdentifier: "com.abeyance.cosmo",
+            teamIdentifier: "P6PV2R9443",
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .asset("AppIcon"),
